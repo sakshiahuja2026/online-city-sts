@@ -1,5 +1,8 @@
 package com.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,8 +71,10 @@ public class SessionController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticate(@RequestBody LoginBean login) {
-		UserBean dbUser = userRepository.findByEmail(login.getEmail());
+		System.out.println("login called.......");
 
+		UserBean dbUser = userRepository.findByEmail(login.getEmail());
+		System.out.println("dbuser...."+dbUser.getEmail());
 		if (dbUser == null || bCrypt.matches(login.getPassword(), dbUser.getPassword()) == false) {
 			ResponseBean<LoginBean> res = new ResponseBean<>();
 			res.setData(login);
@@ -79,21 +84,28 @@ public class SessionController {
 			String authToken = tokenService.generateToken(16);
 			dbUser.setAuthToken(authToken);
 			userRepository.save(dbUser);
-			return null;
+			//log.info("AuthToken generated");
+			
+			ResponseBean<Map<String, Object>> res = new ResponseBean<>();
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put("user", dbUser);
+			res.setData(data);
+			res.setMsg("Login done...");
+			return ResponseEntity.ok(res);
 		}
 	}
 	@PostMapping("/otpsend")
 	public ResponseEntity<?> sendotp(@RequestBody LoginBean login){
 		EmailDetailsBean emailBean = new EmailDetailsBean();
 		String email =  login.getEmail();
-		//UserBean userBean = userRepository.findByEmail(email);
+		UserBean userBean = userRepository.findByEmail(email);
 		Integer otp = otpService.genrateOtp();
 		emailBean.setRecipient(email);
 		emailBean.setSubject("forget password otp");
 		emailBean.setMsgBody("forgot password OTP is-"+otp);
 		emailController.sendMail(emailBean);
-		//userBean.setOtp(otp);
-		//userRepository.save(userBean);
+		userBean.setOtp(otp);
+		userRepository.save(userBean);
 		return ResponseEntity.ok(emailBean);
 	}
 	@PostMapping("/otp")
@@ -108,9 +120,10 @@ public class SessionController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
 		}else if(otp.equals(forgotpassword.getOtp())) {
 			res.setData(email);
+			System.out.println("email printed"+email);
 			res.setMsg("successfully...");
 			userBean.setOtp(null);
-//			userRepo.save(userBean);
+    userRepository.save(userBean);
 			return ResponseEntity.ok(res);
 		}else {
 			res.setData(email);
@@ -122,7 +135,9 @@ public class SessionController {
 	public ResponseEntity<?> updatepassword(@RequestBody LoginBean login){
 		ResponseBean<Object> res = new ResponseBean<>();
 		UserBean userBean = userRepository.findByEmail(login.getEmail());
+		System.out.println(login.getEmail());
 		userBean.setPassword(bCrypt.encode(login.getPassword()));
+		System.out.println(login.getPassword());
 		userRepository.save(userBean);
 		res.setData(userBean);
 		res.setMsg("password successfully forgot...");
