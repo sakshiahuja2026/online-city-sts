@@ -6,54 +6,46 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.Transient;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
 @Entity
-@Table(name = "serviceprovider")
+@Table(name="service_provider")
 @Data
 public class ServiceProviderBean {
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer serviceProviderId; 
+	private Integer providerId;
 	
-	@NotBlank(message = "Please enter First Name")
 	private String firstName;
-
-	@NotBlank(message = "Please enter Last Name")
 	private String lastName;
-	
 	@Temporal(TemporalType.DATE)
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern="dd-mm-yyyy")
 	private Date Dob;
-
-	@NotBlank(message = "Please enter Gender")
 	private String gender;
-
-	@NotBlank(message = "Please enter Email")
 	private String email;
-
-	@NotBlank(message = "Please enter Phone number")
-	private String phone;
-
-	@NotBlank(message = "Please enter password")
+	private Integer phone;
 	private String password;
-
-	private Integer pincode;
-	
-	@NotBlank(message = "Please insert photo")
-	private String imgUrl;
-	
+	private String pincode;
 	private String service;
-		
+//	private String authToken;
+	@Transient
+	MultipartFile photo;
+	String profilepath;
+	private String isActive;
 	
-	}
-	
-
+	@ManyToOne
+	@JoinColumn(name = "roleId", nullable = false)
+	RoleBean role;
+}

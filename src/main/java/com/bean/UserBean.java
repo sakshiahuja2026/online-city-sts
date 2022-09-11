@@ -29,7 +29,7 @@ public class UserBean {
 	@JoinColumn(name = "roleId", nullable = false)
 	RoleBean role;
 
-	String authToken;
+//	String authToken;
 	private Integer otp;
 	
 
@@ -39,9 +39,6 @@ public class UserBean {
 	@NotBlank(message = "Please enter Last Name")
 	private String lastName;
 
-	/*
-	 * @NotBlank(message = "Please enter Date")
-	 */
 	@Temporal(TemporalType.DATE)
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date Dob;
@@ -76,13 +73,13 @@ public class UserBean {
 		this.role = role;
 	}
 
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
+//	public String getAuthToken() {
+//		return authToken;
+//	}
+//
+//	public void setAuthToken(String authToken) {
+//		this.authToken = authToken;
+//	}
 
 	public String getFirstName() {
 		return firstName;
